@@ -3,9 +3,7 @@
 ; Return a list containing only the digits in the supplied list, maintaining
 ; order.
 (define (digits-from s)
-  (cond ((empty? s) '())
-        ((digit? (car s)) (cons (car s) (digits-from (cdr s))))
-        (#t (digits-from (cdr s)))))
+  (filter digit? s))
 
 ; Evaluate to true iff the supplied character is a digit.
 ; If a character is not supplied, evaluate to false.
