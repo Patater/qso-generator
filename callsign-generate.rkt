@@ -13,5 +13,18 @@
   (cond ((char? c) (char-set-contains? char-set:digit c))
         (#t #f)))
 
+; Return a list containing only the letters in the supplied list, maintaining
+; order.
+(define (letters-from s)
+  (filter letter? s))
+
+; Evaluate to true iff the supplied character is a letter.
+; If a character is not supplied, evaluate to false.
+(define (letter? c)
+  (cond ((char? c) (char-set-contains? char-set:letter c))
+        (#t #f)))
+
 (provide digits-from
-         digit?)
+         digit?
+         letters-from
+         letter?)
