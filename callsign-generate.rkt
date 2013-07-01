@@ -31,8 +31,17 @@
   (cond ((char? c) (char-set-contains? legal-country-prefix-chars c))
         (#t #f)))
 
+(define (minimum-country-prefix-length c)
+  (let ([min-prefix-length-2 '(#\3 #\4 #\5 #\6 #\7 #\8 #\9 #\A #\C #\D #\E #\H
+                               #\J #\L #\O #\P #\S #\T #\U #\V #\X #\Y #\Z)]
+        [min-prefix-length-1 '(#\2 #\B #\F #\G #\I #\K #\M #\N #\R #\W)])
+    (cond ((member c min-prefix-length-2) 2)
+          ((member c min-prefix-length-1) 1)
+          (#t -1))))
+
 (provide digits-from
          digit?
          letters-from
          letter?
-         valid-country-prefix?)
+         valid-country-prefix?
+         minimum-country-prefix-length)
