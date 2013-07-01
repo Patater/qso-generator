@@ -105,6 +105,11 @@
   (cond ((and (char>=? c start) (char<=? c end)) #t)
         (#t #f)))
 
+(define (bahamas-callsign? s)
+  (cond ((< (length s) 3) #f)
+        ((and (equal? (take s 2) '(#\C #\6)) (in-range? (third s) #\A #\Z)) #t)
+        (#t #f)))
+
 (provide digits-from
          digit?
          letters-from
@@ -116,4 +121,5 @@
          allow-numeral-in-country-prefix?
          random-from
          generate-country
-         in-range?)
+         in-range?
+         bahamas-callsign?)

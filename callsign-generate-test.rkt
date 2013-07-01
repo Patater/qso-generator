@@ -436,3 +436,15 @@
 (check-equal? (in-range? #\Z #\A #\Z) #t)
 (check-equal? (in-range? #\0 #\A #\Z) #f)
 (check-equal? (in-range? #\, #\A #\Z) #f)
+
+; bahamas-callsign?
+(check-equal? (bahamas-callsign? '(#\C #\6 #\A)) #t)
+(check-equal? (bahamas-callsign? '(#\C #\6 #\Z)) #t)
+(check-equal? (bahamas-callsign? '(#\C #\6 #\Z #\Q #\N)) #t)
+(check-equal? (bahamas-callsign? '(#\C #\6 #\0)) #f)
+(check-equal? (bahamas-callsign? '(#\C #\6 #\9)) #f)
+(check-equal? (bahamas-callsign? '(#\C #\6 #\,)) #f)
+(check-equal? (bahamas-callsign? '(#\C #\6)) #f)
+(check-equal? (bahamas-callsign? '(#\B)) #f)
+(check-equal? (bahamas-callsign? '()) #f)
+(check-equal? (bahamas-callsign? '(#\N #\1 #\I #\R #\Z)) #f)
