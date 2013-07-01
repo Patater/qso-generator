@@ -429,3 +429,10 @@
   (check <= (length (generate-country 3 '(#\K #\M #\1))) max-country-length)
   (check >= (length (generate-country 3 '(#\K #\M #\1))) min-country-length)
   (check <= (length (generate-country 3 '(#\1))) max-country-length))
+
+; in-range?
+(check-equal? (in-range? #\F #\A #\Z) #t)
+(check-equal? (in-range? #\A #\A #\Z) #t)
+(check-equal? (in-range? #\Z #\A #\Z) #t)
+(check-equal? (in-range? #\0 #\A #\Z) #f)
+(check-equal? (in-range? #\, #\A #\Z) #f)

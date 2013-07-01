@@ -101,6 +101,10 @@
                              numeral-allowed
                              (- (max min-prefix-length desired-length) 1)))))))
 
+(define (in-range? c start end)
+  (cond ((and (char>=? c start) (char<=? c end)) #t)
+        (#t #f)))
+
 (provide digits-from
          digit?
          letters-from
@@ -111,4 +115,5 @@
          minimum-country-prefix-length
          allow-numeral-in-country-prefix?
          random-from
-         generate-country)
+         generate-country
+         in-range?)
