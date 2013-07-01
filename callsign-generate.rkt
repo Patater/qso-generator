@@ -39,9 +39,16 @@
           ((member c min-prefix-length-1) 1)
           (#t -1))))
 
+(define (allow-numeral-in-country-prefix? c)
+  (let ([numeral-allowed '(#\A #\C #\D #\E #\H #\J #\L
+                           #\P #\S #\T #\V #\Y #\Z)])
+  (cond ((member c numeral-allowed) #t)
+        (#t #f))))
+
 (provide digits-from
          digit?
          letters-from
          letter?
          valid-country-prefix?
-         minimum-country-prefix-length)
+         minimum-country-prefix-length
+         allow-numeral-in-country-prefix?)
