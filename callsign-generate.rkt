@@ -1,6 +1,7 @@
 #lang racket
 
 (require srfi/14) ; char-set-contains
+(require srfi/1) ; lset-intersection
 
 ; Return a list containing only the digits in the supplied list, maintaining
 ; order.
@@ -42,13 +43,16 @@
   (cond ((char? c) (char-set-contains? legal-country-prefix-chars c))
         (#t #f)))
 
+(define (minimum-country-prefix-length-list n)
+  (cond ((= n 2) '(#\3 #\4 #\5 #\6 #\7 #\8 #\9 #\A #\C #\D #\E #\H
+                   #\J #\L #\O #\P #\S #\T #\U #\V #\X #\Y #\Z))
+        ((= n 1) '(#\2 #\B #\F #\G #\I #\K #\M #\N #\R #\W))
+        (#t '())))
+
 (define (minimum-country-prefix-length c)
-  (let ([min-prefix-length-2 '(#\3 #\4 #\5 #\6 #\7 #\8 #\9 #\A #\C #\D #\E #\H
-                               #\J #\L #\O #\P #\S #\T #\U #\V #\X #\Y #\Z)]
-        [min-prefix-length-1 '(#\2 #\B #\F #\G #\I #\K #\M #\N #\R #\W)])
-    (cond ((member c min-prefix-length-2) 2)
-          ((member c min-prefix-length-1) 1)
-          (#t -1))))
+  (cond ((member c (minimum-country-prefix-length-list 2)) 2)
+        ((member c (minimum-country-prefix-length-list 1)) 1)
+        (#t -1)))
 
 (define (allow-numeral-in-country-prefix? c)
   (let ([numeral-allowed '(#\A #\C #\D #\E #\H #\J #\L
@@ -60,6 +64,43 @@
   (cond ((null? s) null)
         (#t (list-ref s (random (length s))))))
 
+(define (additional-country-symbol mastered-symbols numeral-allowed)
+  (if numeral-allowed (random-from (letters+digits-from mastered-symbols))
+      (random-from (letters-from mastered-symbols))))
+
+(define (add-additional-country-symbol mastered-symbols
+                                       numeral-allowed
+                                       remaining)
+  (cond ((zero? remaining) '())
+        (#t (cons (additional-country-symbol mastered-symbols numeral-allowed)
+                  (add-additional-country-symbol mastered-symbols
+                                                 numeral-allowed
+                                                 (- remaining 1))))))
+
+; Generate a list of valid start symbols that have a minimum prefix length less
+; than or equal to the desired length.
+(define (country-prefix-start-symbols desired-length mastered-symbols)
+  (cond ((= desired-length 1) (lset-intersection equal?
+                                (minimum-country-prefix-length-list 1)
+                                mastered-symbols))
+        (#t (filter valid-country-prefix? mastered-symbols))))
+
+(define (random-country-prefix-start desired-length mastered-symbols)
+  (random-from (country-prefix-start-symbols desired-length mastered-symbols)))
+
+; Generate a valid country prefix for use in an amateur radio callsign
+(define (generate-country desired-length mastered-symbols)
+  (let* ([start (random-country-prefix-start desired-length mastered-symbols)]
+         [numeral-allowed (allow-numeral-in-country-prefix? start)]
+         [min-prefix-length (minimum-country-prefix-length start)]
+         [remaining (max min-prefix-length desired-length)])
+    (cond ((< min-prefix-length 0) '())
+          ((< desired-length min-prefix-length) '())
+          (#t (cons start (add-additional-country-symbol
+                             mastered-symbols
+                             numeral-allowed
+                             (- (max min-prefix-length desired-length) 1)))))))
+
 (provide digits-from
          digit?
          letters-from
@@ -69,4 +110,5 @@
          valid-country-prefix?
          minimum-country-prefix-length
          allow-numeral-in-country-prefix?
-         random-from)
+         random-from
+         generate-country)
