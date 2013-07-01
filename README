@@ -2,4 +2,6 @@ The point of this program is to generate random QSOs given a partial alphabet,
 as would be useful when learning morse code with the Koch method. We aren't
 quite there yet, as this is a work in progress.
 
-This will be my first Lisp program.
+Currently, we can generate country prefixes for callsigns.
+
+This is my first Lisp program.
