@@ -24,7 +24,15 @@
   (cond ((char? c) (char-set-contains? char-set:letter c))
         (#t #f)))
 
+; A country prefix is any alphanumeric symbol except [.0,/Q?1]
+(define legal-country-prefix-chars
+  (char-set-delete char-set:letter+digit #\. #\0 #\, #\/ #\Q #\? #\1))
+(define (valid-country-prefix? c)
+  (cond ((char? c) (char-set-contains? legal-country-prefix-chars c))
+        (#t #f)))
+
 (provide digits-from
          digit?
          letters-from
-         letter?)
+         letter?
+         valid-country-prefix?)
