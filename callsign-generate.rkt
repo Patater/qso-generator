@@ -56,6 +56,10 @@
   (cond ((member c numeral-allowed) #t)
         (#t #f))))
 
+(define (random-from s)
+  (cond ((null? s) null)
+        (#t (list-ref s (random (length s))))))
+
 (provide digits-from
          digit?
          letters-from
@@ -64,4 +68,5 @@
          letter+digit?
          valid-country-prefix?
          minimum-country-prefix-length
-         allow-numeral-in-country-prefix?)
+         allow-numeral-in-country-prefix?
+         random-from)
