@@ -24,6 +24,17 @@
   (cond ((char? c) (char-set-contains? char-set:letter c))
         (#t #f)))
 
+; Return a list containing only the letters and digits in the supplied list,
+; maintaining order.
+(define (letters+digits-from s)
+    (filter letter+digit? s))
+
+; Evaluate to true iff the supplied character is a letter or a digit.
+; If a character is not supplied, evaluate to false.
+(define (letter+digit? c)
+    (cond ((char? c) (char-set-contains? char-set:letter+digit c))
+                  (#t #f)))
+
 ; A country prefix is any alphanumeric symbol except [.0,/Q?1]
 (define legal-country-prefix-chars
   (char-set-delete char-set:letter+digit #\. #\0 #\, #\/ #\Q #\? #\1))
@@ -49,6 +60,8 @@
          digit?
          letters-from
          letter?
+         letters+digits-from
+         letter+digit?
          valid-country-prefix?
          minimum-country-prefix-length
          allow-numeral-in-country-prefix?)
