@@ -448,3 +448,40 @@
 (check-equal? (bahamas-callsign? '(#\B)) #f)
 (check-equal? (bahamas-callsign? '()) #f)
 (check-equal? (bahamas-callsign? '(#\N #\1 #\I #\R #\Z)) #f)
+
+; generate-separating-numeral
+; This function can do random stuff, but we are currently only testing its
+; non-random behavior.
+(check-equal? (generate-separating-numeral '(#\N) '(#\1)) '(#\1))
+(check-equal? (generate-separating-numeral '(#\Q) '(#\2)) '(#\2))
+(check-equal? (generate-separating-numeral '(#\B) '(#\3)) '(#\3))
+(check-equal? (generate-separating-numeral '(#\N) '()) '())
+(check-equal? (generate-separating-numeral '(#\C #\6 #\A) '(#\1)) '())
+(check-equal? (generate-separating-numeral '(#\C #\6 #\0) '(#\1)) '(#\1))
+
+; generate-suffix
+; This function can do random stuff, but we are currently only testing its
+; non-random behavior.
+(check-equal? (generate-suffix 0 '(#\K #\M)) '())
+; never end in a number, even when that's all you have available
+(check-equal? (generate-suffix 1 '(#\1)) '())
+(check-equal? (length (generate-suffix 1 '(#\K #\M))) 1)
+(check-equal? (length (generate-suffix 2 '(#\K #\M))) 2)
+(check-equal? (length (generate-suffix 3 '(#\K #\M))) 3)
+(check-equal? (length (generate-suffix 4 '(#\K #\M))) 4)
+(check-equal? (generate-suffix 4 '(#\K)) '(#\K #\K #\K #\K))
+(check-equal? (generate-suffix 3 '(#\K)) '(#\K #\K #\K))
+(check-equal? (generate-suffix 3 '(#\M)) '(#\M #\M #\M))
+(check-equal? (generate-suffix 2 '(#\M)) '(#\M #\M))
+(check-equal? (generate-suffix 1 '(#\M)) '(#\M))
+
+; generate-random-callsign
+; This function can do random stuff, but we are currently only testing its
+; non-random behavior.
+(let ([max-callsign-length (+ 3 1 4)] [min-callsign-length (+ 1 1 1)])
+  (check <= (length (generate-random-callsign '(#\K #\M))) max-callsign-length)
+  (check >= (length (generate-random-callsign '(#\K #\M))) min-callsign-length)
+  (check <= (length (generate-random-callsign '(#\K #\M #\1))) max-callsign-length)
+  (check >= (length (generate-random-callsign '(#\K #\M #\1))) min-callsign-length)
+  (check <= (length (generate-random-callsign '(#\1))) max-callsign-length)
+  (check >= (length (generate-random-callsign '(#\1))) min-callsign-length))

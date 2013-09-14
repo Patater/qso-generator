@@ -110,6 +110,32 @@
         ((and (equal? (take s 2) '(#\C #\6)) (in-range? (third s) #\A #\Z)) #t)
         (#t #f)))
 
+(define (generate-separating-numeral country mastered-symbols)
+  (cond ((bahamas-callsign? country) '())
+        (#t (let ([digits (digits-from mastered-symbols)])
+              (if (empty? digits) '() (list (random-from digits)))))))
+
+(define (random-suffix-length)
+  (let ([r (random 6)])
+    (cond ((< r 1) 4) ; 1/6 of the time
+          ((< r 2) 1) ; 1/6 of the time
+          ((< r 3) 2) ; 1/6 of the time
+          (#t 3)))) ; half the time
+
+(define (generate-suffix length mastered-symbols)
+  (cond ((zero? length) '())
+        ((= length 1) (let ([letters (letters-from mastered-symbols) ])
+                        (if (empty? letters) '()
+                            (list (random-from letters)))))
+        (#t (cons (random-from (letters+digits-from mastered-symbols))
+                  (generate-suffix (- length 1) mastered-symbols)))))
+
+(define (generate-random-callsign mastered-symbols)
+  (let ([country (generate-country (random 3) mastered-symbols)])
+    (append country
+            (generate-separating-numeral country mastered-symbols)
+            (generate-suffix (random-suffix-length) mastered-symbols))))
+
 (provide digits-from
          digit?
          letters-from
@@ -122,4 +148,8 @@
          random-from
          generate-country
          in-range?
-         bahamas-callsign?)
+         bahamas-callsign?
+         generate-country
+         generate-separating-numeral
+         generate-suffix
+         generate-random-callsign)
