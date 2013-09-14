@@ -392,14 +392,6 @@
 (check-equal? (allow-numeral-in-country-prefix? 'SK@) #f)
 (check-equal? (allow-numeral-in-country-prefix? 'AR!) #f)
 
-; I'm not sure how best to test this. This is obviously inadequate.
-(check member (random-from '(#\A #\B #\C #\1 #\2 #\3))
-              '(#\A #\B #\C #\1 #\2 #\3))
-(check member (random-from '(#\A #\B #\C #\1 #\2 #\3))
-              '(#\A #\B #\C #\1 #\2 #\3))
-(check member (random-from '(#\A #\B #\C #\1 #\2 #\3))
-              '(#\A #\B #\C #\1 #\2 #\3))
-
 ; generate-country
 ; This function can do random stuff, but we are currently only testing its
 ; non-random behavior.

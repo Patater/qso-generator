@@ -1,5 +1,6 @@
 #lang racket
 
+(require "random-from.rkt")
 (require srfi/14) ; char-set-contains
 (require srfi/1) ; lset-intersection
 
@@ -59,10 +60,6 @@
                            #\P #\S #\T #\V #\Y #\Z)])
   (cond ((member c numeral-allowed) #t)
         (#t #f))))
-
-(define (random-from s)
-  (cond ((null? s) null)
-        (#t (list-ref s (random (length s))))))
 
 (define (additional-country-symbol mastered-symbols numeral-allowed)
   (if numeral-allowed (random-from (letters+digits-from mastered-symbols))
