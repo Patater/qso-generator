@@ -104,6 +104,16 @@
                              ((a donkey is) . ((your 1) (a 2)))
                              ((donkey is your) . ((chain. 1)))))))
 
+(check-equal? (build-word-level-markov-chain-from-file 2 "markov-test.txt")
+              (make-hash '((("My" "name") . (("is" 1)))
+                           (("name" "is") . (("Andrey" 1)))
+                           (("is" "Andrey") . (("Markov" 1)))
+                           (("Andrey" "Markov") . (("and" 1)))
+                           (("Markov" "and") . (("this" 1)))
+                           (("and" "this") . (("is" 1)))
+                           (("this" "is") . (("my" 1)))
+                           (("is" "my") . (("chain." 1))))))
+
 (let ([corpus '(My name is Andrey Markov and this is my chain.)])
   (check-equal? (generate-similar-corpus 2 corpus 20) corpus)
   (check-equal? (generate-similar-corpus 3 corpus 20) corpus)
