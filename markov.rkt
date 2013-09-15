@@ -2,6 +2,18 @@
 (require "random-from.rkt")
 (require "pick.rkt")
 
+(define (make-chain)
+  (list '() (make-hash)))
+
+(define (chain-hash chain)
+  (car (cdr chain)))
+
+(define (chain-start-transition-list chain)
+  (car chain))
+
+(define (add-start-n-gram-to-chain s chain)
+  (list (update-transition-list s (chain-start-transition-list chain)) (chain-hash chain)))
+
 (define (update-n-gram-hash! n s h position)
     (cond ((< position (- n 1)) '())
           (#t (let ([key (n-gram-at n position s)])
@@ -33,49 +45,48 @@
            (cons new-pair (cdr l))))
         (#t (cons (car l) (update-transition-list s (cdr l))))))
 
-(define (update-markov-chain-hash! n s h position)
-    (cond ((< position n) '())
+(define (update-markov-chain-hash! n s chain position)
+    (cond ((< position n) chain)
           (#t (let* ([n+1-gram (n-gram-at (+ n 1) position s)]
                      [key (take n+1-gram n)]
-                     [next-word (last n+1-gram)])
-                (cond ((hash-has-key? h key)
-                       (hash-set! h key (update-transition-list next-word (hash-ref h key))))
-                      (#t (hash-set! h key (update-transition-list next-word '()))))
-                (update-markov-chain-hash! n s h (- position 1))))))
+                     [next-word (last n+1-gram)]
+                     [hash (chain-hash chain)])
+                (cond ((hash-has-key? hash key)
+                       (hash-set! hash key (update-transition-list next-word (hash-ref hash key))))
+                      (#t (hash-set! hash key (update-transition-list next-word '()))))
+                (update-markov-chain-hash! n s
+                                           (cond ((= position n) (add-start-n-gram-to-chain key chain))
+                                                 (#t chain))
+                                           (- position 1))))))
 
 (define (generate-markov-chain n s)
-  (let ([position (- (length s) 1)] [h (make-hash)])
-    (update-markov-chain-hash! n s h position)
-    h))
+  (let ([position (- (length s) 1)] [chain (make-chain)])
+    (update-markov-chain-hash! n s chain position)))
 
 (define (build-word-level-markov-chain-from-file n path)
-  (define (parse-line! h)
+  (define (parse-line! chain)
   (let ([line (read-line)])
-    (cond ((equal? line eof) '())
+    (cond ((equal? line eof) chain)
           (#t (let* ([corpus (string-split line " ")] [position (- (length corpus) 1)])
-                 (update-markov-chain-hash! n corpus h position)
-                  (parse-line! h)
-                  h)))))
+                 (parse-line! (update-markov-chain-hash! n corpus chain position)))))))
   (with-input-from-file path
     (lambda ()
-        (parse-line! (make-hash)))))
+        (parse-line! (make-chain)))))
 
 (define (build-letter-level-markov-chain-from-file n path)
-  (define (parse-line! h)
+  (define (parse-line! chain)
   (let ([line (read-line)])
-    (cond ((equal? line eof) '())
+    (cond ((equal? line eof) chain)
           (#t (let* ([corpus (string-split line "")] [position (- (length corpus) 1)])
-                 (update-markov-chain-hash! n corpus h position)
-                  (parse-line! h)
-                  h)))))
+                 (parse-line! (update-markov-chain-hash! n corpus chain position)))))))
   (with-input-from-file path
     (lambda ()
-        (parse-line! (make-hash)))))
+        (parse-line! (make-chain)))))
 
 (define (traverse-markov-chain n-gram markov-chain word-limit)
   (cond ((zero? word-limit) '())
-        ((hash-has-key? markov-chain n-gram)
-         (let ([next-word (pick (hash-ref markov-chain n-gram))])
+        ((hash-has-key? (chain-hash markov-chain) n-gram)
+         (let ([next-word (pick (hash-ref (chain-hash markov-chain) n-gram))])
            (cons next-word
                  (traverse-markov-chain (append (cdr n-gram)
                                                 (list next-word))
@@ -83,17 +94,21 @@
                                         (- word-limit 1)))))
         (#t '())))
 
+(define (start-markov-chain-traversal markov-chain word-limit)
+  (let ([initial-n-gram (pick (chain-start-transition-list markov-chain))])
+    (append initial-n-gram
+          (traverse-markov-chain initial-n-gram
+                                 markov-chain
+                                 (- word-limit (length initial-n-gram))))))
+
 (define (generate-similar-corpus n-gram-n corpus word-limit)
-  (let ([first-n-gram (n-gram-at n-gram-n (- n-gram-n 1) corpus)]
-        [markov-chain (generate-markov-chain n-gram-n corpus)])
-    (append first-n-gram
-            (traverse-markov-chain first-n-gram
-                                   markov-chain
-                                   (- word-limit n-gram-n)))))
+  (let ([markov-chain (generate-markov-chain n-gram-n corpus)])
+    (start-markov-chain-traversal markov-chain word-limit)))
 
 (provide n-gram-at
          n-grams
          update-transition-list
+         chain-hash
          generate-markov-chain
          build-word-level-markov-chain-from-file
          generate-similar-corpus)
