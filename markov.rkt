@@ -60,6 +60,18 @@
     (lambda ()
         (parse-line! (make-hash)))))
 
+(define (build-letter-level-markov-chain-from-file n path)
+  (define (parse-line! h)
+  (let ([line (read-line)])
+    (cond ((equal? line eof) '())
+          (#t (let* ([corpus (string-split line "")] [position (- (length corpus) 1)])
+                 (update-markov-chain-hash! n corpus h position)
+                  (parse-line! h)
+                  h)))))
+  (with-input-from-file path
+    (lambda ()
+        (parse-line! (make-hash)))))
+
 (define (traverse-markov-chain n-gram markov-chain word-limit)
   (cond ((zero? word-limit) '())
         ((hash-has-key? markov-chain n-gram)
