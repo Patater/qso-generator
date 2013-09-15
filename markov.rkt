@@ -1,5 +1,6 @@
 #lang racket
 (require "random-from.rkt")
+(require "pick.rkt")
 
 (define (update-n-gram-hash! n s h position)
     (cond ((< position (- n 1)) '())
@@ -19,14 +20,27 @@
     (update-n-gram-hash! n s h position)
     h))
 
+(define (update-transition-list s l)
+  (define (fetch-item-count-pair l)
+    (car l))
+  (define (fetch-first-item l)
+    (car (fetch-item-count-pair l)))
+  (define (fetch-first-count l)
+    (car (cdr (fetch-item-count-pair l))))
+  (cond ((null? l) (list (list s 1)))
+        ((equal? s (fetch-first-item l))
+         (let ([new-pair (list s (+ 1 (fetch-first-count l)))])
+           (cons new-pair (cdr l))))
+        (#t (cons (car l) (update-transition-list s (cdr l))))))
+
 (define (update-markov-chain-hash! n s h position)
     (cond ((< position n) '())
           (#t (let* ([n+1-gram (n-gram-at (+ n 1) position s)]
                      [key (take n+1-gram n)]
                      [next-word (last n+1-gram)])
                 (cond ((hash-has-key? h key)
-                       (hash-set! h key (cons next-word (hash-ref h key))))
-                      (#t (hash-set! h key (list next-word))))
+                       (hash-set! h key (update-transition-list next-word (hash-ref h key))))
+                      (#t (hash-set! h key (update-transition-list next-word '()))))
                 (update-markov-chain-hash! n s h (- position 1))))))
 
 (define (generate-markov-chain n s)
@@ -37,7 +51,7 @@
 (define (traverse-markov-chain n-gram markov-chain word-limit)
   (cond ((zero? word-limit) '())
         ((hash-has-key? markov-chain n-gram)
-         (let ([next-word (random-from (hash-ref markov-chain n-gram))])
+         (let ([next-word (pick (hash-ref markov-chain n-gram))])
            (cons next-word
                  (traverse-markov-chain (append (cdr n-gram)
                                                 (list next-word))
@@ -55,5 +69,6 @@
 
 (provide n-gram-at
          n-grams
+         update-transition-list
          generate-markov-chain
          generate-similar-corpus)
