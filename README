@@ -1,7 +1,11 @@
 The point of this program is to generate random QSOs given a partial alphabet,
-as would be useful when learning morse code with the Koch method. We aren't
-quite there yet, as this is a work in progress.
+as would be useful when learning morse code with the Koch method.
 
-Currently, we can generate random callsigns and word-level similar texts.
+Using functions from this program, we can generate random callsigns; word-level
+similar texts; letter-level similar texts; texts that resemble the original,
+but are created with a subset of the original alphabet; and random QSOs given a
+partial alphabets.
 
-This is my first Lisp program.
+This is my first Lisp program, so expect it to be horrible. I'd love to learn
+the idioms of the language better. I had a lot a lot of fun learning Lisp so
+far.
