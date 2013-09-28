@@ -15,3 +15,15 @@
   (check-equal? (pick-from-pair-list 8 pair-list) "c")
   (check-equal? (pick-from-pair-list 9 pair-list) "c")
   (check-equal? (pick-from-pair-list 0 '((("a" "b") 1) (("c" "d") 1))) '("a" "b")))
+
+(let ([pair-list '(() () ())])
+  (check-equal? (pick-from-pair-list 0 pair-list) '()))
+
+(let ([pair-list '(("a" 2) () ())])
+  (check-equal? (pick-from-pair-list 0 pair-list) "a")
+  (check-equal? (pick-from-pair-list 1 pair-list) "a"))
+
+(let ([pair-list '(("a" 2) () ("c" 1))])
+  (check-equal? (pick-from-pair-list 0 pair-list) "a")
+  (check-equal? (pick-from-pair-list 1 pair-list) "a")
+  (check-equal? (pick-from-pair-list 2 pair-list) "c"))
