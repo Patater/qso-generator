@@ -32,13 +32,15 @@
     (update-n-gram-hash! n s h position)
     h))
 
+(define (fetch-item-count-pair l)
+  (car l))
+(define (fetch-first-item l)
+  (car (fetch-item-count-pair l)))
+(define (fetch-rest-items l)
+  (cdr l))
+(define (fetch-first-count l)
+  (car (cdr (fetch-item-count-pair l))))
 (define (update-transition-list s l)
-  (define (fetch-item-count-pair l)
-    (car l))
-  (define (fetch-first-item l)
-    (car (fetch-item-count-pair l)))
-  (define (fetch-first-count l)
-    (car (cdr (fetch-item-count-pair l))))
   (cond ((null? l) (list (list s 1)))
         ((equal? s (fetch-first-item l))
          (let ([new-pair (list s (+ 1 (fetch-first-count l)))])
@@ -105,10 +107,51 @@
   (let ([markov-chain (generate-markov-chain n-gram-n corpus)])
     (start-markov-chain-traversal markov-chain word-limit)))
 
+
+(define (build-hierarchical-markov-chain-from-file path)
+  (list (build-word-level-markov-chain-from-file 2 path)
+        (build-word-level-markov-chain-from-file 1 path)
+        (build-letter-level-markov-chain-from-file 3 path)
+        (build-letter-level-markov-chain-from-file 2 path)
+        (build-letter-level-markov-chain-from-file 1 path)))
+
+; We need to be able to fetch the transition list from the hierarchical markov
+; chain at any level at any time given an hchain, a level (like
+; hchain-letter-1), and history object of sorts, give transition list
+; appropriate for the specified level.
+(define (hchain-word-2 hchain)
+  (car hchain))
+(define (hchain-word-1 hchain)
+  (car (cdr hchain)))
+(define (hchain-letter-3 hchain)
+  (car (cdr (cdr hchain))))
+(define (hchain-letter-2 hchain)
+  (car (cdr (cdr (cdr hchain)))))
+(define (hchain-letter-1 hchain)
+  (car (cdr (cdr (cdr (cdr hchain))))))
+
+(define (string-is-composed-of-symbols? s symbols)
+  (subset? (list->set (string->list (if (list? s) (string-join s "") s))) (list->set symbols)))
+
+(define (filter-transition-list tlist symbols)
+  (cond ((null? tlist) '())
+        ((string-is-composed-of-symbols? (fetch-first-item tlist) symbols)
+         (cons (fetch-item-count-pair tlist) (filter-transition-list (cdr tlist) symbols)))
+        (#t (filter-transition-list (cdr tlist) symbols))))
+
 (provide n-gram-at
          n-grams
          update-transition-list
          chain-hash
          generate-markov-chain
          build-word-level-markov-chain-from-file
-         generate-similar-corpus)
+         build-hierarchical-markov-chain-from-file
+         chain-start-transition-list
+         filter-transition-list
+         hchain-word-2
+         hchain-word-1
+         hchain-letter-3
+         hchain-letter-2
+         hchain-letter-1
+         generate-similar-corpus
+         string-is-composed-of-symbols?)

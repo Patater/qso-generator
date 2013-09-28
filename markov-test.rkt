@@ -136,3 +136,8 @@
   (check-equal? (generate-similar-corpus 2 corpus 20) corpus)
   (check-equal? (generate-similar-corpus 3 corpus 20) corpus)
   (check-equal? (generate-similar-corpus 2 corpus 4) '(My name is Andrey)))
+
+
+(check-true (string-is-composed-of-symbols? "ABC" '(#\A #\B #\C)))
+(check-true (string-is-composed-of-symbols? "ABC" '(#\A #\B #\C #\D)))
+(check-false (string-is-composed-of-symbols? "ABC" '(#\B #\C #\D)))
