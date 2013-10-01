@@ -395,7 +395,8 @@
          (list->string (generate-random-callsign mastered-symbols))]
         [callsign-from
          (list->string (generate-random-callsign mastered-symbols))]
-        [markov-chain (build-hierarchical-markov-chain-from-file "qso.txt")])
+        [markov-chain
+         (build-hierarchical-markov-chain-from-file "corpora/qso.txt")])
     (string-join
      (strip-emptiness
       (append (list (if (member #\V mastered-symbols) "VVV VVV" "")

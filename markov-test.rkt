@@ -104,7 +104,7 @@
                              ((a donkey is) . ((your 1) (a 2)))
                              ((donkey is your) . ((chain. 1)))))))
 
-(check-equal? (chain-hash (build-word-level-markov-chain-from-file 2 "markov-test.txt"))
+(check-equal? (chain-hash (build-word-level-markov-chain-from-file 2 "corpora/markov-test.txt"))
               (make-hash '((("My" "name") . (("is" 1)))
                            (("name" "is") . (("Andrey" 1)))
                            (("is" "Andrey") . (("Markov" 1)))
@@ -114,7 +114,7 @@
                            (("this" "is") . (("my" 1)))
                            (("is" "my") . (("chain." 1))))))
 
-(check-equal? (build-word-level-markov-chain-from-file 2 "markov-test-multiline.txt")
+(check-equal? (build-word-level-markov-chain-from-file 2 "corpora/markov-test-multiline.txt")
               (list '((("My" "name") 2) (("His" "name") 1))
                     (make-hash '((("My" "name") . (("is" 2)))
                                  (("His" "name") . (("is" 1)))
